@@ -203,7 +203,6 @@ const FilterBox = ({ filterFunction }) => {
 const JobList = ({ jobs }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-
   return (
     <Box width={{ base: "full", md: "10/12" }} p={4}>
       {jobs.map((job) => (
@@ -291,7 +290,7 @@ const JobList = ({ jobs }) => {
                 mb={2}
               >
                 Experience
-                {job.experience==''?'Any':job.experience}
+                {job.experience == "" ? "Any" : job.experience}
               </Button>
             </ButtonGroup>
           </Flex>
@@ -299,7 +298,7 @@ const JobList = ({ jobs }) => {
           <Divider my={2} />
           <Flex justify={"space-between"}>
             <Button leftIcon={<FaLocationArrow />} variant="link" m={2}>
-             {job.via}
+              {job.via}
             </Button>
             <Button
               variant={"outline"}
@@ -310,13 +309,14 @@ const JobList = ({ jobs }) => {
             >
               View Details
             </Button>
-
             <Modal isOpen={isOpen} onClose={onClose} size="xl">
               <ModalOverlay />
               <ModalContent>
                 <ModalHeader>{job.position}</ModalHeader>
                 <ModalCloseButton />
-                <ModalBody>{job.description}</ModalBody>
+                <ModalBody maxHeight="80vh" overflowY="auto">
+                  {job.description}
+                </ModalBody>
 
                 <ModalFooter>
                   <Button
@@ -325,7 +325,7 @@ const JobList = ({ jobs }) => {
                     mr={3}
                     onClick={onClose}
                   >
-                    CLose
+                    Close
                   </Button>
                   <Button
                     colorScheme="teal"
@@ -393,22 +393,23 @@ const JobBoard = () => {
   // const query="data scientist"
 
   const fetchData = async (query) => {
+    console.log(query);
     try {
-
-      const response = await fetch(`http://localhost:8000/jobs?query=${query}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          // Add any additional headers if needed
-        },
-        // You can add a request body if your server expects it
-      });
-  
+      const response = await fetch(
+        `http://localhost:8000/jobs?query=${"job in "+query + "for disabled people"}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            // Add any additional headers if needed
+          },
+          // You can add a request body if your server expects it
+        }
+      );
 
       // Use await to get the actual data from the response
       const responseData = await response.json();
       console.log(responseData);
-     
 
       const jobDataFromAPI = responseData.jobs_results.map((job, index) => {
         const postedAt =
@@ -441,8 +442,6 @@ const JobBoard = () => {
     }
   };
 
-
-
   const handleFilter = (filter) => {
     const filtered = dummyJobData.filter((job) =>
       job.position.toLowerCase().includes(filter.toLowerCase())
@@ -450,14 +449,11 @@ const JobBoard = () => {
     setFilteredJobs(filtered);
   };
 
-
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
   const [responseData, setResponseData] = useState(null);
 
-
-  
   // useEffect(() => {
-  
+
   // }, []);
 
   return (
@@ -468,19 +464,24 @@ const JobBoard = () => {
           <FilterBox filterFunction={handleFilter} />
         </GridItem>
         <GridItem>
-        <Container maxW="xl">
-        <Box p={6} boxShadow="lg" rounded="lg">
-          <Input
-            placeholder="Enter search query"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            mb={4}
-          />
-          <Button colorScheme="teal" onClick={()=>{    fetchData(query)}}>
-            Fetch Data
-          </Button>
-        </Box>
-      </Container>
+          <Container maxW="xl">
+            <Box p={6} boxShadow="lg" rounded="lg">
+              <Input
+                placeholder="Enter search query"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                mb={4}
+              />
+              <Button
+                colorScheme="teal"
+                onClick={() => {
+                  fetchData(query);
+                }}
+              >
+                Search
+              </Button>
+            </Box>
+          </Container>
 
           <JobList jobs={filteredJobs} />
         </GridItem>
