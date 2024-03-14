@@ -16,7 +16,7 @@ import { getFirestore, doc, getDoc } from "firebase/firestore";
 import AiCourse from "./screens/AiCourse";
 import Navbar from "./components/Navbar";
 import YoutubeSearch from "./components/Transcript";
-import DisabilityRightsInfo from "./screens/DisabilityRightsInfo";
+import DisabilityRightsInfo from "./screens/DisabilityRightsInfo";  
 import Footer from "./components/Footer";
 import AiVideo from "./screens/AiVideo";
 import Community from "./screens/Community";
@@ -175,5 +175,6 @@ function App() {
     </>
   );
 }
+
 
 export default App;
