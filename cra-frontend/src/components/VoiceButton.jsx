@@ -31,7 +31,7 @@ const LanguageButtons = () => {
     { name: "Hindi", code: "hi" },
     { name: "Tamil", code: "ta" },
     { name: "Telugu", code: "te" },
-    { name: "Bengali", code: "bn" },
+    { name: "Bengali", code: "bg" },
     // Add more languages as needed
   ];
 
@@ -57,169 +57,123 @@ const LanguageButtons = () => {
 const VoiceButton = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isListening, setIsListening] = useState(false);
-  const [confirmation, setConfirmation] = useState(false);
-  const [currentLink, setCurrentLink] = useState("");
+  const [currentLink, setCurrentLink] = useState(null);
   const [status, setStatus] = useState("Not Listening");
-  const [said, setSaid] = useState(0);
   const { transcript, browserSupportsSpeechRecognition } =
     useSpeechRecognition();
   const navigate = useNavigate();
 
   const startListening = () => {
-    SpeechRecognition.startListening({ continuous: true, language: "en-IN" });
-    setIsListening(true);
-    setStatus("Listening...");
+    if (!isListening) {
+      SpeechRecognition.startListening({ continuous: true, language: "en-IN" });
+      setIsListening(true);
+      setStatus("Listening...");
+    }
   };
 
   const stopListening = () => {
+    if (!isListening) {
+      return null;
+    }
     SpeechRecognition.stopListening();
     setIsListening(false);
     setStatus("");
   };
 
-  const handleConfirmation = (confirmed) => {
-    setConfirmation(confirmed);
-
-    if (confirmed && currentLink != "") {
-      navigate(`/${currentLink}`);
-      const initialSpeech = "Navigation to " + currentLink + "Completed";
-      const initialUtterance = new SpeechSynthesisUtterance(initialSpeech);
-      window.speechSynthesis.speak(initialUtterance);
-    }
-    setConfirmation(false);
-    setCurrentLink("");
-    setSaid(0);
-  };
-
   useEffect(() => {
-    let parsingText = transcript.toLowerCase();
-    // remove punctuation
-    parsingText = parsingText.replace(/[^\w\s]/gi, "");
+    const parsingText = transcript.toLowerCase().replace(/[^\w\s]/gi, "");
     console.log(transcript, parsingText);
-    if (parsingText.includes("dashboard") && !confirmation) {
-      setCurrentLink("dashboard");
-      stopListening();
-    } else if (parsingText.includes("job") && !confirmation) {
-      setCurrentLink("jobs");
-      stopListening();
-    } else if (parsingText.includes("home") && !confirmation) {
-      setCurrentLink("");
-      stopListening();
-    } else if (
-      parsingText.includes("" || parsingText.includes("employee")) &&
-      !confirmation
-    ) {
-      setCurrentLink("profile/:name");
-      stopListening();
-    } else if (parsingText.includes("virtual assistant") && !confirmation) {
-      setCurrentLink("virtualassistant");
-    } else if (parsingText.includes("ai course") && !confirmation) {
-      setCurrentLink("aicourse");
-      stopListening();
-    } else if (parsingText.includes("resume") && !confirmation) {
-      setCurrentLink("resumebuilder");
-      stopListening();
-    } else if (parsingText.includes("blog") && !confirmation) {
-      setCurrentLink("blog");
-      stopListening();
-    } else if (parsingText.includes("speech") && !confirmation) {
-      setCurrentLink("speech");
-      stopListening();
-    } else if (parsingText.includes("web") && !confirmation) {
-      setCurrentLink("web");
-      stopListening();
-    } else if (parsingText.includes("rights") && !confirmation) {
-      setCurrentLink("disabilityrightsinfo");
-      stopListening();
-    } else if (parsingText.includes("video") && !confirmation) {
-      setCurrentLink("aivideo");
-      stopListening();
-    } else if (parsingText.includes("ocr") && !confirmation) {
-      setCurrentLink("ocr");
-      stopListening();
-    } else if (parsingText.includes("community") && !confirmation) {
-      setCurrentLink("community");
-      stopListening();
-    } else if (parsingText.includes("feedback") && !confirmation) {
-      setCurrentLink("feedback");
-      stopListening();
-    } else if (parsingText.includes("browse") && !confirmation) {
-      setCurrentLink("browse");
-      stopListening();
-    } else if (parsingText.includes("community") && !confirmation) {
-      setCurrentLink("community");
-      stopListening();
-    } else if (parsingText.includes("feedback") && !confirmation) {
-      setCurrentLink("feedback");
-      stopListening();
-    } else if (
-      (parsingText.includes("yes") || parsingText.includes("yeah")) &&
-      !confirmation
-    ) {
-      handleConfirmation(true);
-      stopListening();
-    } else if (
-      (parsingText.includes("no") || parsingText.includes("nah")) &&
-      !confirmation
-    ) {
-      handleConfirmation(false);
-      stopListening();
+
+    const commands = {
+      dashboard: "dashboard",
+      job: "jobs",
+      home: "",
+      login:"signup",
+      "sign up":"signup",
+      auth:"signup",
+      employee: "profile/:name",
+      "virtual assistant": "virtualassistant",
+      "ai course": "aicourse",
+      resume: "resumebuilder",
+      blog: "blog",
+      speech: "speech",
+      web: "web",
+      rights: "disabilityrightsinfo",
+      video: "aivideo",
+      ocr: "ocr",
+      community: "community",
+      feedback: "feedback",
+      browse: "browse",
+    };
+
+    for (const [command, link] of Object.entries(commands)) {
+      if (parsingText.includes(command)) {
+        setCurrentLink(link);
+        stopListening();
+        break;
+      }
     }
 
-    if (currentLink != "" && !said) {
-      const initialSpeech =
-        "Do you want to navigate to " + currentLink + "? Please say yes or no.";
+    if (currentLink !== null) {
+      navigate(`/${currentLink}`);
+      const initialSpeech = `Navigation to ${currentLink} completed`;
       const initialUtterance = new SpeechSynthesisUtterance(initialSpeech);
-
-      initialUtterance.onend = () => {
-        setSaid(1);
-        // Speech synthesis has ended, set isListening to true
-        startListening();
-        // setIsListening(true);
-      };
-
       window.speechSynthesis.speak(initialUtterance);
-    }
-  }, [transcript, confirmation]);
 
+      if (currentLink === "dashboard") {
+        const dashboardUtterance = new SpeechSynthesisUtterance(
+          "Dashboard has three sections: Profile, Resume Builder, and Recommended Jobs. What do you want to do?"
+        );
+        window.speechSynthesis.speak(dashboardUtterance);
+      }
+
+      window.location.reload();
+      setCurrentLink(null);
+    }
+  }, [transcript]);
+
+  
   if (!browserSupportsSpeechRecognition) {
     setStatus("Your browser does not support speech recognition.");
   }
+
   return (
-    <Box color={"teal.800"} aria-label="Voice Assistant">
+    <Box color="teal.800" aria-label="Voice Assistant">
       <IconButton
         width="full"
         icon={<FaMicrophone />}
         aria-label="Voice Button"
         onClick={() => {
-          const initialSpeech = "Voice Assistant How may I help you today?";
+          const initialSpeech = "Voice Assistant, how may I help you today?";
           const initialUtterance = new SpeechSynthesisUtterance(initialSpeech);
           window.speechSynthesis.speak(initialUtterance);
 
           onOpen();
-          startListening();
+          initialUtterance.onend = () => {
+            startListening();
+          };
         }}
         size="lg"
         colorScheme="teal"
         aria-labelledby="voice-assistant"
       />
-
       <Drawer isOpen={isOpen} placement="bottom" onClose={onClose}>
         <DrawerOverlay />
         <DrawerContent>
           <DrawerHeader>Voice Assistant</DrawerHeader>
           <DrawerBody>
-            {/* Your content here */}
-            <LanguageButtons />
-            <Card>
-              <Flex direction="column" align="center" justify="center">
-                <Text>{status}</Text>
-
-                <Text size={"3xl"} mt={4}>
+            <Flex direction="column" align="center" justify="center">
+              <Box>
+                <Text fontSize="lg" color="gray.500">
+                  {status}
+                </Text>
+              </Box>
+              <Box>
+                <Text fontSize="3xl" mt={2} fontWeight="bold" color="teal.500">
                   {transcript}
                 </Text>
-              </Flex>
-            </Card>
+              </Box>
+            </Flex>
           </DrawerBody>
           <ModalFooter>
             {isListening ? (
@@ -227,7 +181,7 @@ const VoiceButton = () => {
                 colorScheme="red"
                 aria-label="Stop Listening"
                 leftIcon={<Icon as={FaMicrophoneSlash} />}
-                width={"full"}
+                width="full"
                 onClick={stopListening}
               >
                 Stop Listening
@@ -237,7 +191,7 @@ const VoiceButton = () => {
                 style={{ backgroundColor: "#2234da", color: "white" }}
                 aria-label="Start Listening"
                 leftIcon={<Icon as={FaMicrophoneAlt} />}
-                width={"full"}
+                width="full"
                 onClick={startListening}
               >
                 Start Listening

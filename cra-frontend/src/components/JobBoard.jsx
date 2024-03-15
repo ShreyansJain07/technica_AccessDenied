@@ -203,6 +203,7 @@ const FilterBox = ({ filterFunction }) => {
 const JobList = ({ jobs }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
+  console.log(jobs)
   return (
     <Box width={{ base: "full", md: "10/12" }} p={4}>
       {jobs.map((job) => (
@@ -297,7 +298,7 @@ const JobList = ({ jobs }) => {
 
           <Divider my={2} />
           <Flex justify={"space-between"}>
-            <Button leftIcon={<FaLocationArrow />} variant="link" m={2}>
+            <Button leftIcon={<FaLocationArrow />} variant="link" m={2} as={"a"}>
               {job.via}
             </Button>
             <Button

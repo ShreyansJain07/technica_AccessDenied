@@ -35,6 +35,7 @@ import {
   IoTextOutline,
   IoContrastSharp,
   IoPaperPlane,
+  IoEyeOutline,
 } from "react-icons/io5";
 import { FaQuestion, FaTrash } from "react-icons/fa";
 import { Divider } from "antd";
@@ -42,19 +43,51 @@ import { ZoomIn, ZoomInSharp, ZoomOutSharp } from "@material-ui/icons";
 
 const AccessibilityGrid = (props) => {
   const { toggleColorMode } = useColorMode();
-  const [zoomLevel, setZoomLevel] = useState(100);
-  const [paused, isPaused] = useState(false);
+  const [zoomLevel, setZoomLevel] = useState(
+    parseInt(localStorage.getItem('zoomLevel')) || 100
+  );
+  const [paused, isPaused] = useState(
+    localStorage.getItem('paused') === 'true' || false
+  );
+  const [hidden, setHidden] = useState(
+    localStorage.getItem('hidden') === 'true' || false
+  );
+  const [animation, setAnimation] = useState(
+    localStorage.getItem('animation') === 'true' || true
+  );
+  const [saturation, setSaturation] = useState(
+    localStorage.getItem('saturation') === 'true' || true
+  );
+
+  // Update local storage when state changes
+  useEffect(() => {
+    localStorage.setItem('zoomLevel', zoomLevel);
+  }, [zoomLevel]);
+
+  useEffect(() => {
+    localStorage.setItem('paused', paused);
+  }, [paused]);
+
+  useEffect(() => {
+    localStorage.setItem('hidden', hidden);
+  }, [hidden]);
+
+  useEffect(() => {
+    localStorage.setItem('animation', animation);
+  }, [animation]);
+
+  useEffect(() => {
+    localStorage.setItem('saturation', saturation);
+  }, [saturation]);
+
+  // Your component rendering and logic here
 
   const zoomIn = () => {
     setZoomLevel((prevZoom) => Math.min(prevZoom + 10, 200));
   };
-  
+
   const zoomOut = () => {
     setZoomLevel((prevZoom) => Math.max(prevZoom - 10, 50));
-  };
-
-  const adjustZoom = () => {
-    document.body.style.zoom = `${zoomLevel}%`;
   };
 
   const features = [
@@ -65,7 +98,19 @@ const AccessibilityGrid = (props) => {
         toggleColorMode();
       },
     },
-    { icon: <IoColorWandOutline />, label: "Highlight Links" },
+    // { icon: <IoColorWandOutline />, label: "Highlight Links" },
+    {
+      icon: paused ? <IoPaperPlane /> : <IoPauseOutline />,
+      label: paused ? "Resume Animations" : "Pause Animations",
+      func: () => {
+        var elements = document.querySelectorAll(".animated-element");
+        elements.forEach(function (element) {
+          // Toggle the class to pause or resume animations
+          element.classList.toggle("paused-animation");
+        });
+        setAnimation(!animation);
+      },
+    },
     {
       icon: <ZoomInSharp />,
       label: "Increase Font Size",
@@ -80,24 +125,66 @@ const AccessibilityGrid = (props) => {
         zoomOut();
       },
     },
-    { icon: <IoText />, label: "Text Spacing" },
     {
-      icon: paused ? <IoPaperPlane /> : <IoPauseOutline />,
-      label: paused ? "Resume Animations" : "Pause Animations",
+      icon: <IoText />,
+      label: "Text Spacing +",
       func: () => {
-        isPaused(!paused);
-      }},
-    { icon: <IoEyeOffOutline />, label: "Hide Images" },
-    { icon: <IoReaderOutline />, label: "Dyslexia Friendly" },
-    { icon: <IoResizeOutline />, label: "Line Height" },
-    { icon: <IoTextOutline />, label: "Text Align" },
-    { icon: <IoContrastSharp />, label: "Saturation" },
+        document.body.style.letterSpacing = "3px";
+      },
+    },
+    {
+      icon: <IoText />,
+      label: "Text Spacing -",
+      func: () => {
+        document.body.style.letterSpacing = "normal";
+      },
+    },
+
+    {
+      icon: hidden ? <IoEyeOutline /> : <IoEyeOffOutline />,
+      label: hidden ? "Show Images" : "Hide Images",
+      func: () => {
+        let images = document.querySelectorAll("img");
+        images.forEach((img) => {
+          img.classList.toggle("hidden");
+        });
+        setHidden(!hidden);
+      },
+    },
+    {
+      icon: <IoContrastSharp />,
+      label: saturation ? "Saturation Change +" : "Saturation Change -",
+      func: () => {
+        if (saturation) {
+          document.body.style.filter = "saturate(0)";
+        } else {
+          document.body.style.filter = "saturate(1)";
+        }
+        setSaturation(!saturation);
+      },
+    },
+    // { icon: <IoReaderOutline />, label: "Dyslexia Friendly" },
+    {
+      icon: <IoResizeOutline />,
+      label: "Line Height +",
+      func: () => {
+        document.body.style.lineHeight = "2";
+      },
+    },
+    {
+      icon: <IoResizeOutline />,
+      label: "Line Height -",
+      func: () => {
+        document.body.style.lineHeight = "1";
+      },
+    },
+    // { icon: <IoTextOutline />, label: "Text Align" },
+    
   ];
 
   useEffect(() => {
     document.body.style.zoom = `${zoomLevel}%`;
   }, [zoomLevel]);
-  
 
   return (
     <Grid templateColumns="repeat(2, 1fr)" gap={4}>
