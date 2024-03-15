@@ -5,8 +5,12 @@
   text-align: center;
 }
 /*
+
+
 .aicourse-info{
-    background-color: lightgray;
+
+
+  background-color: lightgray;
     width: 30%;
     margin: 0 auto;
     padding: 15px;
@@ -14,14 +18,17 @@
 }
 
 .aicourse-inputarea{
-    display: flex;
+
+  display: flex;
     flex-direction: column;
     gap: 10px;
     width: 30%;
     margin: 10px auto;
 }
 
+
 .aicourse-input{
+
 
 }
 
