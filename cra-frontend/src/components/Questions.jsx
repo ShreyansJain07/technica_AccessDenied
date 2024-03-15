@@ -37,7 +37,7 @@ function LinearProgressWithLabel(props) {
         <CircularProgress variant="determinate" size={150} {...props} />
       </Box>
       <Box minWidth={35}>
-        <Typography variant="body2" color="textSecondary">{`${Math.round(
+        <Typography style={{marginLeft:"45%"}} variant="body2" color="textSecondary">{`${Math.round(
           props.value
         )}%`}</Typography>
       </Box>

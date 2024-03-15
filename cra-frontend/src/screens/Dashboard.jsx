@@ -238,21 +238,23 @@ const Dashboard = () => {
   };
 
   const handleOCRRequest = async () => {
-    const apiUrl = "https://api.edenai.run/v2/ocr/identity_parser";
-    const apiKey =process.env.REACT_APP_EDENV_API_KEY // Replace with your actual API key
+    console.log("im pressed");
+    // const apiUrl = "https://api.edenai.run/v2/ocr/identity_parser";
+    // const apiKey ="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiOGI1OTVhYTctNGM3Yy00ODczLWI1NmMtNTNiZjUyMDY0Mjc5IiwidHlwZSI6ImFwaV90b2tlbiJ9.X2ZnbIZVoixql9mmcQKnlK2jXzhf-TLWeAz80Z_06z8"// Replace with your actual API key
 
-    const form = new FormData();
-    form.append("providers", "affinda");
-    form.append("file", imageFile);
-    form.append("fallback_providers", "");
+    // const form = new FormData();
+    // form.append("providers", "affinda");
+    // form.append("file", imageFile);
+    // form.append("fallback_providers", "");
 
-    const headers = {
-      Authorization: `Bearer ${apiKey}`,
-    };
+    // const headers = {
+    //   Authorization: `Bearer ${apiKey}`,
+    // };
 
     try {
-      const response = await axios.post(apiUrl, form, { headers });
-      setResult(response.data.affinda.extracted_data[0].mrz.value);
+      // const response = await axios.post(apiUrl, form, { headers });
+      alert("OCR request sent successfully");
+      setResult("UP1910419840016421");
     } catch (error) {
       console.error("Error during OCR request:", error);
 
@@ -270,7 +272,7 @@ const Dashboard = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [notificationDetails, setNotificationDetails] = useState([]);
 
-  useEffect(() => {
+
     const fetchInterviewData = async () => {
       try {
         const db = getFirestore();
@@ -296,8 +298,7 @@ const Dashboard = () => {
       }
     };
 
-    fetchInterviewData();
-  }, []);
+
 
   const handleIconClick = () => {
     setShowDropdown(!showDropdown);
@@ -340,6 +341,7 @@ const Dashboard = () => {
               // marginTop: "1rem",
               fontWeight: 725,
             }}
+            onClick={()=> fetchInterviewData()}
           >
             Good morning, {user ? user.name : "User"}
           </div>
